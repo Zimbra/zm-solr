@@ -1,0 +1,82 @@
+<project name="SolrPlugins" default="jar"> 
+
+    <import file="../ant-global.xml" />
+	<property name="build.dir" location="target" />
+    <property name="jar.file" value="solrplugins-${project.maven.version}.jar" />
+	<property name="dist.jar.file" value="solrplugins.jar" />
+    
+    <path id="class.path">
+      <pathelement location="${common.classes.dir}"/>
+      <pathelement location="${build.classes.dir}"/>
+      <fileset dir="${common.jars.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${common.internal.jars.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${common.dir}/jars-test">
+        <include name="**/*.jar"/>
+      </fileset>
+	  <fileset dir="${common.dir}/jars-test">
+	        <include name="**/*.jar"/>
+      </fileset>
+    	
+    </path>
+      	
+	<target name="deploy" depends="jar,deploy-libs">
+		<if>
+ 	       <available file="${zimbra.home.dir}/jetty/webapps/solr.war" type="file"/>
+	        <then>
+	        	<ant dir="${server.dir}" target="stop-webserver" inheritAll="false" />
+            </then>
+            <else>
+                <echo>Solr wbapp is not installed; skipping stop-webserver</echo>
+            </else>
+        </if>
+		<if>
+ 	       <available file="${zimbra.home.dir}/jetty/webapps/solr.war" type="file"/>
+	        <then>
+	        	<ant dir="${server.dir}" target="start-webserver" inheritAll="false" />
+            </then>
+            <else>
+                <echo>Solr webapp not installed; skipping start-webserver</echo>
+            </else>
+        </if>
+	    <ant dir="${server.dir}" target="stop-solr" inheritAll="false" />
+	    <ant dir="${server.dir}" target="start-solr" inheritAll="false" />
+	</target>
+
+	<target name="jar" depends="compile" description="Creates the jar file">
+		<!-- next line will not be required once ZimbraServer is integrated from SOLR to main -->
+<!--		<maven dir=".." goal="dependency:copy-dependencies"/> -->
+        	<antcall target="zimbra-jar">
+        	<param name="jar.file" value="${jar.file}"/>
+            <param name="implementation.title" value="Solr Plugins"/>
+        </antcall>
+    </target>
+
+	<target name="deploy-libs" description="move all required jars to the proper location">
+		<maven dir="." goal="dependency:copy-dependencies"/>
+		<copy file="${solrplugins.jarfile}" toDir="/opt/zimbra/solr/lib/custom"/>
+		<copy file="${common.jars.dir}/guava-13.0.1.jar" toDir="/opt/zimbra/solr/lib/custom"/>
+		<copy file="${common.jars.dir}/mail-1.4.5.jar" toDir="/opt/zimbra/solr/lib/custom"/>
+		<copy file="${common.jarfile}" toDir="/opt/zimbra/solr/lib/custom"/>
+        <copy file="${common.jars.dir}/lucene-misc-${lucene.version}.jar" toDir="/opt/zimbra/solr/lib/custom"/>
+		<copy file="${common.jars.dir}/lucene-core-${lucene.version}.jar" toDir="/opt/zimbra/solr/lib/custom"/>
+		<copy file="${common.jars.dir}/lucene-analyzers-common-${lucene.version}.jar" toDir="/opt/zimbra/solr/lib/custom"/>
+		<copy file="${common.jars.dir}/lucene-queryparser-${lucene.version}.jar" toDir="/opt/zimbra/solr/lib/custom"/>
+    </target>
+
+	<target name="dist" description="place output and all required jars into ./dist folder" depends="jar">
+	   <delete dir="${dist.dir}" failonerror="false" />
+	   <mkdir dir="${dist.dir}/" />
+       <maven dir="." goal="dependency:copy-dependencies"/>
+        <copy file="${solrplugins.jarfile}" tofile="${dist.dir}/${dist.jar.file}"/>
+        <copy file="${common.jars.dir}/guava-13.0.1.jar" toDir="${dist.dir}"/>
+        <copy file="${common.jars.dir}/mail-1.4.5.jar" toDir="${dist.dir}"/>
+        <copy file="${common.jarfile}" tofile="${dist.dir}/zimbracommon.jar"/>
+        <copy file="${common.jars.dir}/lucene-core-${lucene.version}.jar" toDir="${dist.dir}"/>
+        <copy file="${common.jars.dir}/lucene-analyzers-common-${lucene.version}.jar" toDir="${dist.dir}"/>
+        <copy file="${common.jars.dir}/lucene-queryparser-${lucene.version}.jar" toDir="${dist.dir}"/>
+	</target>
+</project>

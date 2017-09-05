@@ -1,0 +1,46 @@
+/*
+ * ***** BEGIN LICENSE BLOCK *****
+ * Zimbra Collaboration Suite Server
+ * Copyright (C) 2010, 2011, 2013 Zimbra Software, LLC.
+ * 
+ * The contents of this file are subject to the Zimbra Public License
+ * Version 1.4 ("License"); you may not use this file except in
+ * compliance with the License.  You may obtain a copy of the License at
+ * http://www.zimbra.com/license.
+ * 
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.
+ * ***** END LICENSE BLOCK *****
+ */
+package com.zimbra.solr;
+
+import java.io.IOException;
+
+import org.apache.lucene.analysis.TokenFilter;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
+/**
+ * Swallow dots, but include dots in a token only when it is not the only char
+ * in the token.
+ */
+public final class ContactTokenFilter extends TokenFilter {
+    protected ContactTokenFilter(TokenStream input) {
+		super(input);
+	}
+
+	private CharTermAttribute termAttr = addAttribute(CharTermAttribute.class);
+
+    @Override
+    public boolean incrementToken() throws IOException {
+        while (input.incrementToken()) {
+            if (termAttr.length() == 1 && termAttr.charAt(0) == '.') {
+                continue; // swallow dot
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
+}
