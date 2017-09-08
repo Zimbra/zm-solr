@@ -1,8 +1,8 @@
 <project name="SolrPlugins" default="jar"> 
 
-    <import file="../ant-global.xml" />
+  <import file="../zm-zcs/ant-global.xml" />
 	<property name="build.dir" location="target" />
-    <property name="jar.file" value="solrplugins-${project.maven.version}.jar" />
+    <property name="jar.file" value="solrplugins.jar" />
 	<property name="dist.jar.file" value="solrplugins.jar" />
     
     <path id="class.path">
