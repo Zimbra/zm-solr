@@ -26,6 +26,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.util.BytesRefBuilder;
+import org.apache.lucene.util.LegacyNumericUtils;
 import org.apache.lucene.util.NumericUtils;
 
 import com.google.common.base.Strings;
@@ -65,7 +66,7 @@ public final class FieldTokenizer extends Tokenizer {
         if (NUMERIC_VALUE_REGEX.matcher(value).matches()) {
             try {
             	BytesRefBuilder brb = new BytesRefBuilder();
-            	NumericUtils.intToPrefixCoded(Integer.parseInt(value), 0, brb);
+            	LegacyNumericUtils.intToPrefixCoded(Integer.parseInt(value), 0, brb);
                 add(name + "#:" + brb.get().utf8ToString());
             } catch (NumberFormatException ignore) { // pass through
             }

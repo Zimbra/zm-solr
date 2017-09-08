@@ -23,6 +23,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.Query;
@@ -62,7 +63,7 @@ public class WildcardQueryParser extends QueryParser {
 		leading = false;
 		trailing = false;
 
-		BooleanQuery intermediate = new BooleanQuery();
+		BooleanQuery.Builder builder = new BooleanQuery.Builder();
 		Query parsed = null;
 
 		if (queryText.startsWith("*")) {
@@ -80,10 +81,10 @@ public class WildcardQueryParser extends QueryParser {
 				queryText = "\""+queryText+"\"";
 			}
 			for (String f: fields) {
-				buildIntermediateQuery(intermediate, f, queryText, null);
+				buildIntermediateQuery(builder, f, queryText, null);
 			}
 			try {
-				parsed = defaultParser.parse(intermediate.toString());
+				parsed = defaultParser.parse(builder.build().toString());
 			} catch (SyntaxError shouldntHappen) {
 				throw new ParseException("Syntax error: " + shouldntHappen.getMessage());
 			}
@@ -103,7 +104,7 @@ public class WildcardQueryParser extends QueryParser {
 					/* This can happen if the textual part of the query is all stopwords, like "the*".
 					 * In this case, we pass the raw text of the query to the SolrQueryParser.
 					 */
-					buildIntermediateQuery(intermediate, fld, queryText.toLowerCase(), null);
+					buildIntermediateQuery(builder, fld, queryText.toLowerCase(), null);
 				} else if (tokens.size() == 1) {
 					/* This is the most common wildcard scenario: a single-term query like "foo*" that doesnt tokenize to anything more complex.
 					 * We can pass the token with the wildcard through to the SolrQueryParser.
@@ -118,7 +119,7 @@ public class WildcardQueryParser extends QueryParser {
 					TokensAtPosition tokensAtFirstPosition = tokens.get(0);
 					String tokenToUse = tokensAtFirstPosition.chooseWildcardToken();
 					attachWildard(sb, tokenToUse, leading, trailing);
-					intermediate = buildIntermediateQuery(intermediate, fld, sb.toString(), null);
+					buildIntermediateQuery(builder, fld, sb.toString(), null);
 				} else {
 					/* Multi-term wildcard queries like "foo bar*" or single-term wildcard queries in non-whitespace delimited languages
 					 * that tokenize to multiple terms need to be handled with wildcard expansion.
@@ -128,19 +129,19 @@ public class WildcardQueryParser extends QueryParser {
 					 */
 					String[] queryParts = queryText.split("(?<=\\*)\\s");
 					boolean includeField = true;
-					MultiPhraseQuery mpq = new MultiPhraseQuery();
+					MultiPhraseQuery.Builder mpqBuilder = new MultiPhraseQuery.Builder();
 					for (int i = 0; i < queryParts.length; i++ ) {
-						if (!parseQueryPart(queryParts[i], fld, mpq)) {
+						if (!parseQueryPart(queryParts[i], fld, mpqBuilder)) {
 							includeField = false;
 						};
 					}
 					if (includeField) {
 						//the only way this is false is if a wildcard expands to nothing in the field
-						buildIntermediateQuery(intermediate, fld, null, new BooleanClause(mpq, Occur.SHOULD));
+						buildIntermediateQuery(builder, fld, null, new BooleanClause(mpqBuilder.build(), Occur.SHOULD));
 					}
 				}
 			}
-			parsed = intermediate;
+			parsed = builder.build();
 		}
 		return parsed;
 	}
@@ -152,12 +153,13 @@ public class WildcardQueryParser extends QueryParser {
 		.append(trailing && !tokenToUse.endsWith("*") ? "*": "");
 	}
 
-	private boolean parseQueryPart(String queryPart, String field, MultiPhraseQuery query) throws ParseException {
+	private boolean parseQueryPart(String queryPart, String field, MultiPhraseQuery.Builder builder) throws ParseException {
 		int curPosition;
-		if (query.getPositions().length == 0) {
+		MultiPhraseQuery mpq = builder.build(); //TODO: does this work?
+		if (mpq.getPositions().length == 0) {
 			curPosition = 0;
 		} else {
-			curPosition = query.getPositions()[query.getPositions().length - 1] + 1;
+			curPosition = mpq.getPositions()[mpq.getPositions().length - 1] + 1;
 		}
 		List<TokensAtPosition> tokens = getAllTokens(this.field, queryPart);
 		if (tokens.size() > 1) {
@@ -167,7 +169,7 @@ public class WildcardQueryParser extends QueryParser {
 				TokensAtPosition tokensAtPosition = tokens.get(i);
 				if (tokensAtPosition != null) {
 					for (String token : tokensAtPosition) {
-						query.add(new Term[] { new Term(field, token) },
+						builder.add(new Term[] { new Term(field, token) },
 								curPosition + i);
 					}
 				}
@@ -190,7 +192,7 @@ public class WildcardQueryParser extends QueryParser {
 				if (expandedTerms.size() == 0) {
 					return false;
 				} else {
-					query.add(expandedTerms.toArray(new Term[expandedTerms.size()]), curPosition + tokens.size() - 1);
+					builder.add(expandedTerms.toArray(new Term[expandedTerms.size()]), curPosition + tokens.size() - 1);
 				}
 			} catch (IOException e) {
 				throw new ParseException("failed expanding phrase wildcard query");
@@ -198,16 +200,16 @@ public class WildcardQueryParser extends QueryParser {
 		} else if (!tokens.isEmpty()){
 			//no wildcard, so add last token back
 			for (String token: tokens.get(tokens.size() - 1)) {
-				query.add(new Term[]{new Term(field, token)}, curPosition + tokens.size() - 1);
+				builder.add(new Term[]{new Term(field, token)}, curPosition + tokens.size() - 1);
 			}
 		}
 		return true;
 	}
 
-	private BooleanQuery buildIntermediateQuery(BooleanQuery curQuery, String field, String queryText, BooleanClause clause) throws ParseException {
+	private void buildIntermediateQuery(BooleanQuery.Builder builder, String field, String queryText, BooleanClause clause) throws ParseException {
 		if (clause != null) {
-			curQuery.add(clause);
-			return curQuery;
+			builder.add(clause);
+			return;
 		} else {
 			if (queryText.startsWith("*") && queryText.endsWith("*")) {
 				queryText = "*" + escape(queryText.substring(1, queryText.length() - 1)) + "*";
@@ -220,11 +222,11 @@ public class WildcardQueryParser extends QueryParser {
 			}
 			Query q = new TermQuery(new Term(field, queryText));
 			try {
-				curQuery.add(defaultParser.parse(q.toString()), Occur.SHOULD);
+				builder.add(defaultParser.parse(q.toString()), Occur.SHOULD);
 			} catch (SyntaxError e) {
 				throw new ParseException("Parse error: " + e.getMessage());
 			}
-			return curQuery;
+			return;
 		}
 	}
 

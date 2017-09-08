@@ -31,9 +31,10 @@ import org.apache.solr.util.PropertiesInputStream;
 import org.apache.solr.util.PropertiesOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MarkerFactory;
 
 /**
- * 
+ *
  * @author Greg Solovyev
  * Implementation of https://issues.apache.org/jira/browse/SOLR-7583
  * TODO: remove when SOLR-7583 is released and update ZimbraBackup to use /replication instead of /zbnr
@@ -80,7 +81,8 @@ public class ZRestoreCore implements Callable<Boolean> {
             // Move all files from backupDir to restoreIndexDir
             for (String filename : backupDir.listAll()) {
                 checkInterrupted();
-                LOG.debug("Copying file {} from {} to {}", filename, backupPath, restoreIndexPath);
+                String debugEntry = String.format("Copying file {} from {} to {}", filename, backupPath.toString(), restoreIndexPath);
+                LOG.debug(debugEntry);
                 try (IndexInput indexInput = backupDir.openInput(filename, IOContext.READONCE)) {
                     restoreIndexDir.copyFrom(backupDir, filename, filename, IOContext.READONCE);
                 } catch (Exception e) {
