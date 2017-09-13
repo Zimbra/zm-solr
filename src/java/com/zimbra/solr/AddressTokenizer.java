@@ -32,7 +32,6 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
 import com.google.common.base.Strings;
 import com.google.common.net.InternetDomainName;
-import com.zimbra.common.localconfig.LC;
 import com.zimbra.common.mime.InternetAddress;
 
 /**
@@ -58,6 +57,10 @@ import com.zimbra.common.mime.InternetAddress;
  * @author ysasaki
  */
 public final class AddressTokenizer extends Tokenizer {
+
+    private final int RFC822_ADDRESS_MAX_TOKEN_LENGTH = 256;
+    private final int RFC822_ADDRESS_MAX_TOKEN_COUNT = 512;
+
 	private final List<String> tokens = new LinkedList<String>();
 	private Iterator<String> itr;
 	private final CharTermAttribute termAttr = addAttribute(CharTermAttribute.class);
@@ -120,10 +123,8 @@ public final class AddressTokenizer extends Tokenizer {
 	}
 
 	private void add(String token) {
-		if (token.length() <= LC.zimbra_index_rfc822address_max_token_length
-				.intValue()
-				&& tokens.size() < LC.zimbra_index_rfc822address_max_token_count
-						.intValue()) {
+		if (token.length() <= RFC822_ADDRESS_MAX_TOKEN_LENGTH
+				&& tokens.size() < RFC822_ADDRESS_MAX_TOKEN_COUNT) {
 			tokens.add(token);
 		}
 	}
