@@ -72,18 +72,18 @@
        The examples below can be used to load some solr-contribs along 
        with their external dependencies.
     -->
-  <lib dir="/opt/zimbra/solr/contrib/extraction/lib" regex=".*\.jar" />
-  <lib dir="/opt/zimbra/solr/dist/" regex="solr-cell-\d.*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/contrib/extraction/lib" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-cell-\d.*\.jar" />
 
-  <lib dir="/opt/zimbra/solr/contrib/clustering/lib/" regex=".*\.jar" />
-  <lib dir="/opt/zimbra/solr/dist/" regex="solr-clustering-\d.*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/contrib/clustering/lib/" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-clustering-\d.*\.jar" />
 
-  <lib dir="/opt/zimbra/solr/contrib/langid/lib/" regex=".*\.jar" />
-  <lib dir="/opt/zimbra/solr/dist/" regex="solr-langid-\d.*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/contrib/langid/lib/" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-langid-\d.*\.jar" />
 
-  <lib dir="/opt/zimbra/solr/contrib/velocity/lib" regex=".*\.jar" />
-  <lib dir="/opt/zimbra/solr/dist/" regex="solr-velocity-\d.*\.jar" />
-
+  <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/server/lib/ext/" regex=".*\.jar" />
   <!-- an exact 'path' can be used instead of a 'dir' to specify a 
        specific jar file.  This will cause a serious error to be logged 
        if it can't be loaded.
@@ -1330,31 +1330,6 @@
     </lst>     
     <arr name="components">
       <str>terms</str>
-    </arr>
-  </requestHandler>
-
-
-  <!-- Query Elevation Component
-
-       http://wiki.apache.org/solr/QueryElevationComponent
-
-       a search component that enables you to configure the top
-       results for a given query regardless of the normal lucene
-       scoring.
-    -->
-  <searchComponent name="elevator" class="solr.QueryElevationComponent" >
-    <!-- pick a fieldType to analyze queries -->
-    <str name="queryFieldType">string</str>
-    <str name="config-file">elevate.xml</str>
-  </searchComponent>
-
-  <!-- A request handler for demonstrating the elevator component -->
-  <requestHandler name="/elevate" class="solr.SearchHandler" startup="lazy">
-    <lst name="defaults">
-      <str name="echoParams">explicit</str>
-    </lst>
-    <arr name="last-components">
-      <str>elevator</str>
     </arr>
   </requestHandler>
 
