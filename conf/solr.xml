@@ -29,6 +29,7 @@
 <solr>
   <str name="configSetBaseDir">/opt/zimbra/solr/server/solr/configsets</str>
   <str name="sharedLib">"${solr.install.dir:../../../..}/server/lib/ext/"</str>
+  <str name="transientCacheSize">${transientCacheSize:100}</str>
   <solrcloud>
     <str name="host">${host:}</str>
     <int name="hostPort">${jetty.port:7983}</int>
