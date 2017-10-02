@@ -359,7 +359,6 @@
          <arr name="env"> <str>MYVAR=val1</str> </arr>
        </listener>
       -->
-       <listener event="postCommit" class="com.zimbra.solr.CommitEventListener" />
   </updateHandler>
   
   <!-- IndexReaderFactory
@@ -996,9 +995,6 @@
   </requestHandler>
 
   <requestHandler name="/zbnr" class="com.zimbra.solr.ZimbraBnRHandler">
-
-  </requestHandler>
-  <requestHandler name="/commitcount" class="com.zimbra.solr.CommitCountHandler">
 
   </requestHandler>
 
