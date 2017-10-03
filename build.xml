@@ -1,0 +1,31 @@
+<project name="SolrPlugins" default="jar"> 
+
+  <import file="../zm-zcs/ant-global.xml" />
+	<property name="build.dir" location="target" />
+  <property name="jar.file" value="solrplugins.jar" />
+    
+    <path id="class.path">
+      <pathelement location="${common.classes.dir}"/>
+      <pathelement location="${build.classes.dir}"/>
+      <fileset dir="${common.jars.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${common.internal.jars.dir}">
+        <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${common.dir}/jars-test">
+        <include name="**/*.jar"/>
+      </fileset>
+	  <fileset dir="${common.dir}/jars-test">
+	        <include name="**/*.jar"/>
+      </fileset>
+    	
+    </path>
+
+	<target name="jar" depends="compile" description="Creates the jar file">
+    <antcall target="zimbra-jar">
+      <param name="jar.file" value="${jar.file}"/>
+      <param name="implementation.title" value="Solr Plugins"/>
+    </antcall>
+  </target>
+</project>
