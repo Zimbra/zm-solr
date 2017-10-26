@@ -37,7 +37,7 @@ import com.zimbra.solr.ZimbraTokenizer.TokenType;
 
 public class WildcardQueryParser extends QueryParser {
 	private SolrQueryParser defaultParser;
-	private IndexReader reader;
+	private LeafReader reader;
 
 	private final Pattern whitespace = Pattern.compile("\\s");
 	private List<String> fields;
@@ -291,14 +291,14 @@ public class WildcardQueryParser extends QueryParser {
 		defaultParser = parser;
 	}
 
-	public void setReader(IndexReader reader) {
+	public void setReader(LeafReader reader) {
 		this.reader = reader;
 	}
 
 	/* modeled on TermsComponent.process() */
 	private List<Term> expandPrefix(String prefix, String field) throws IOException {
 		List<Term> expanded = new LinkedList<Term>();
-		Fields lfields = ((LeafReader) reader).fields();
+		Fields lfields = reader.fields();
 		if (lfields == null) {
 		    return expanded;
 		}

@@ -40,7 +40,7 @@ class ZimbraWildcardQParser extends QParser {
 				getReq().getSchema().getQueryAnalyzer());
 		parser.setFields(localParams.get("fields", defaultField));
 		parser.setDefaultParser(new SolrQueryParser(this, defaultField));
-		parser.setReader(getReq().getSearcher().getIndexReader());
+		parser.setReader(getReq().getSearcher().getSlowAtomicReader());
 		String maxExpansions = localParams.get("maxExpansions", null);
 		if (maxExpansions != null) {
 			parser.setMaxExpansions(Integer.parseInt(maxExpansions));
