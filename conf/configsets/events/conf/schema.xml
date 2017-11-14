@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<schema name="events" version="1.6">
+
+    <field name="_version_" type="long" indexed="false" stored="false"/>
+    <field name="id" type="string" indexed="true" stored="true" />
+    <field name="_root_" type="string" indexed="true" stored="false"/>
+    <field name="ev_type" type="string" indexed="true" stored="false" required="false"/>
+    <field name="ev_timestamp" type="pdate" indexed="true" stored="true" required="false"/>
+    <field name="msg_id" type="pint" indexed="true" stored="false" required="false"/>
+    <field name="acct_id" type="string" indexed="true" stored="false" required="false" />
+    <field name="datasource_id" type="string" indexed="true" stored="false" required="false" />
+
+    <uniqueKey>id</uniqueKey>
+
+    <dynamicField name="*_i"  type="int"    indexed="true"  stored="true"/>
+    <dynamicField name="*_is" type="ints"    indexed="true"  stored="true"/>
+    <dynamicField name="*_s"  type="string"  indexed="true"  stored="true" />
+    <dynamicField name="*_ss" type="strings"  indexed="true"  stored="true"/>
+    <dynamicField name="*_l"  type="long"   indexed="true"  stored="true"/>
+    <dynamicField name="*_ls" type="longs"   indexed="true"  stored="true"/>
+    <dynamicField name="*_b"  type="boolean" indexed="true" stored="true"/>
+    <dynamicField name="*_bs" type="booleans" indexed="true" stored="true"/>
+    <dynamicField name="*_f"  type="float"  indexed="true"  stored="true"/>
+    <dynamicField name="*_fs" type="floats"  indexed="true"  stored="true"/>
+    <dynamicField name="*_d"  type="double" indexed="true"  stored="true"/>
+    <dynamicField name="*_ds" type="doubles" indexed="true"  stored="true"/>
+
+    <dynamicField name="*_dt"  type="date"    indexed="true"  stored="true"/>
+    <dynamicField name="*_dts" type="date"    indexed="true"  stored="true" multiValued="true"/>
+
+    <!-- KD-tree (point) numerics -->
+    <dynamicField name="*_pi" type="pint"    indexed="true"  stored="true"/>
+    <dynamicField name="*_pis" type="pints"    indexed="true"  stored="true"/>
+    <dynamicField name="*_pl" type="plong"   indexed="true"  stored="true"/>
+    <dynamicField name="*_pls" type="plongs"   indexed="true"  stored="true"/>
+    <dynamicField name="*_pf" type="pfloat"  indexed="true"  stored="true"/>
+    <dynamicField name="*_pfs" type="pfloats"  indexed="true"  stored="true"/>
+    <dynamicField name="*_pd" type="pdouble" indexed="true"  stored="true"/>
+    <dynamicField name="*_pds" type="pdoubles" indexed="true"  stored="true"/>
+    <dynamicField name="*_pdt" type="pdate"  indexed="true"  stored="true"/>
+    <dynamicField name="*_pdts" type="pdates"  indexed="true"  stored="true"/>
+
+    <!-- some trie-coded dynamic fields -->
+    <dynamicField name="*_ti" type="tint"    indexed="true"  stored="true"/>
+    <dynamicField name="*_tis" type="tints"    indexed="true"  stored="true"/>
+    <dynamicField name="*_tl" type="tlong"   indexed="true"  stored="true"/>
+    <dynamicField name="*_tls" type="tlongs"   indexed="true"  stored="true"/>
+    <dynamicField name="*_tf" type="tfloat"  indexed="true"  stored="true"/>
+    <dynamicField name="*_tfs" type="tfloats"  indexed="true"  stored="true"/>
+    <dynamicField name="*_td" type="tdouble" indexed="true"  stored="true"/>
+    <dynamicField name="*_tds" type="tdoubles" indexed="true"  stored="true"/>
+    <dynamicField name="*_tdt" type="tdate"  indexed="true"  stored="true"/>
+    <dynamicField name="*_tdts" type="tdates"  indexed="true"  stored="true"/>
+
+    <!-- field type definitions -->
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true" />
+    <fieldType name="strings" class="solr.StrField" sortMissingLast="true" multiValued="true" docValues="true" />
+
+    <!-- boolean type: "true" or "false" -->
+    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
+
+    <fieldType name="booleans" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>
+
+    <!--
+      Numeric field types that index values using KD-trees. *Point fields are faster and more efficient than Trie* fields both, at
+      search time and at index time, but some features are still not supported.
+      Point fields don't support FieldCache, so they must have docValues="true" if needed for sorting, faceting, functions, etc.
+    -->
+    <fieldType name="pint" class="solr.IntPointField" docValues="true"/>
+    <fieldType name="pfloat" class="solr.FloatPointField" docValues="true"/>
+    <fieldType name="plong" class="solr.LongPointField" docValues="true"/>
+    <fieldType name="pdouble" class="solr.DoublePointField" docValues="true"/>
+
+    <fieldType name="pints" class="solr.IntPointField" docValues="true" multiValued="true"/>
+    <fieldType name="pfloats" class="solr.FloatPointField" docValues="true" multiValued="true"/>
+    <fieldType name="plongs" class="solr.LongPointField" docValues="true" multiValued="true"/>
+    <fieldType name="pdoubles" class="solr.DoublePointField" docValues="true" multiValued="true"/>
+
+    <!--
+      Default numeric field types. For faster range queries, consider *PointFields (pint/pfloat/plong/pdouble), or the
+      tint/tfloat/tlong/tdouble types.
+    -->
+    <fieldType name="int" class="solr.TrieIntField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="float" class="solr.TrieFloatField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="long" class="solr.TrieLongField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="double" class="solr.TrieDoubleField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
+
+    <fieldType name="ints" class="solr.TrieIntField" docValues="true" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
+    <fieldType name="floats" class="solr.TrieFloatField" docValues="true" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
+    <fieldType name="longs" class="solr.TrieLongField" docValues="true" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
+    <fieldType name="doubles" class="solr.TrieDoubleField" docValues="true" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
+
+    <!--
+     Numeric field types that index each value at various levels of precision
+     to accelerate range queries when the number of values between the range
+     endpoints is large. See the javadoc for NumericRangeQuery for internal
+     implementation details.
+
+     Smaller precisionStep values (specified in bits) will lead to more tokens
+     indexed per value, slightly larger index size, and faster range queries.
+     A precisionStep of 0 disables indexing at different precision levels.
+
+     Consider using pint/pfloat/plong/pdouble instead of Trie* fields if possible
+    -->
+    <fieldType name="tint" class="solr.TrieIntField" docValues="true" precisionStep="8" positionIncrementGap="0"/>
+    <fieldType name="tfloat" class="solr.TrieFloatField" docValues="true" precisionStep="8" positionIncrementGap="0"/>
+    <fieldType name="tlong" class="solr.TrieLongField" docValues="true" precisionStep="8" positionIncrementGap="0"/>
+    <fieldType name="tdouble" class="solr.TrieDoubleField" docValues="true" precisionStep="8" positionIncrementGap="0"/>
+
+    <fieldType name="tints" class="solr.TrieIntField" docValues="true" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+    <fieldType name="tfloats" class="solr.TrieFloatField" docValues="true" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+    <fieldType name="tlongs" class="solr.TrieLongField" docValues="true" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+    <fieldType name="tdoubles" class="solr.TrieDoubleField" docValues="true" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+
+    <fieldType name="pdate" class="solr.DatePointField" docValues="true"/>
+    <fieldType name="pdates" class="solr.DatePointField" docValues="true" multiValued="true"/>
+
+    <fieldType name="date" class="solr.TrieDateField" docValues="true" precisionStep="0" positionIncrementGap="0"/>
+    <fieldType name="dates" class="solr.TrieDateField" docValues="true" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
+
+    <fieldType name="tdate" class="solr.TrieDateField" docValues="true" precisionStep="6" positionIncrementGap="0"/>
+    <fieldType name="tdates" class="solr.TrieDateField" docValues="true" precisionStep="6" positionIncrementGap="0" multiValued="true"/>
+
+    <fieldType name="binary" class="solr.BinaryField"/>
+
+</schema>
