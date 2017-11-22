@@ -22,10 +22,13 @@
     <field name="id" type="string" indexed="true" stored="true" />
     <field name="_root_" type="string" indexed="true" stored="false"/>
     <field name="ev_type" type="string" indexed="true" stored="false" required="false"/>
-    <field name="ev_timestamp" type="pdate" indexed="true" stored="true" required="false"/>
-    <field name="msg_id" type="pint" indexed="true" stored="false" required="false"/>
+    <field name="ev_timestamp" type="date" indexed="true" stored="true" required="false"/>
+    <field name="msg_id" type="int" indexed="true" stored="false" required="false"/>
     <field name="acct_id" type="string" indexed="true" stored="false" required="false" />
     <field name="datasource_id" type="string" indexed="true" stored="false" required="false" />
+
+    <!--copy indexed address fields into a stored field for retrieval-->
+    <copyField source="*_zaddr" dest="*_s"/>
 
     <uniqueKey>id</uniqueKey>
 
@@ -68,6 +71,9 @@
     <dynamicField name="*_tds" type="tdoubles" indexed="true"  stored="true"/>
     <dynamicField name="*_tdt" type="tdate"  indexed="true"  stored="true"/>
     <dynamicField name="*_tdts" type="tdates"  indexed="true"  stored="true"/>
+
+    <!-- dynamic field used for event address fields -->
+    <dynamicField name="*_zaddr" type="zmaddress" indexed="true" stored="false"/>
 
     <!-- field type definitions -->
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true" />
@@ -139,5 +145,14 @@
     <fieldType name="tdates" class="solr.TrieDateField" docValues="true" precisionStep="6" positionIncrementGap="0" multiValued="true"/>
 
     <fieldType name="binary" class="solr.BinaryField"/>
+
+    <fieldType name="zmaddress" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
+      <analyzer type="index">
+        <tokenizer class="com.zimbra.solr.ZimbraAddressTokenizerFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="com.zimbra.solr.ZimbraAddressTokenizerFactory"/>
+      </analyzer>
+    </fieldType>
 
 </schema>
