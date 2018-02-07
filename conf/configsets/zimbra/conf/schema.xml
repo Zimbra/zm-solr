@@ -159,6 +159,7 @@
     <field name="sh_exact" type="zmid" indexed="true" stored="true"  multiValued="false" />
     <field name="sh_terms" type="zmsearchhistory" indexed="true" stored="false" multiValued="false" />
     <field name="doctype" type="string" indexed="true" stored="false" multiValued="false" />
+    <field name="acct_id" type="string" indexed="true" stored="false" required="true" />
 
     <!-- Only enabled in the "schemaless" data-driven example (assuming the client
          does not know what fields may be searched) because it's very expensive to index everything twice. -->
