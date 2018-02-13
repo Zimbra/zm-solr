@@ -125,7 +125,7 @@
     <field name="solrId" type="string" indexed="true" stored="true" required="true" />
     <field name="l.mbox_blob_id" type="int" indexed="true" stored="true"  multiValued="false" />
     <field name="l.version" type="string" indexed="true" stored="true" />
-    <field name="has" type="zmtext_nr" indexed="true" stored="false"/>
+    <field name="has" type="zmtext_noreverse" indexed="true" stored="false"/>
     <field name="l.contactData" type="zmcontact" indexed="true" stored="false"/>
     <field name="l.date" type="zmdate" indexed="true" stored="true"/>
     <field name="attachment" type="zmmimetype" indexed="true" stored="true" multiValued="true" />
@@ -140,15 +140,14 @@
     <field name="cc" type="zmaddress" indexed="true" stored="true" />
     <field name="to" type="zmaddress" indexed="true" stored="true" />
     <field name="from" type="zmaddress" indexed="true" stored="true" />
-    <field name="cc_sw" type="zmaddress_sw" indexed="true" stored="true" />
-    <field name="to_sw" type="zmaddress_sw" indexed="true" stored="true" />
-    <field name="from_sw" type="zmaddress_sw" indexed="true" stored="true" />
+    <field name="cc_search" type="zmaddress_search" indexed="true" stored="true" />
+    <field name="to_search" type="zmaddress_search" indexed="true" stored="true" />
+    <field name="from_search" type="zmaddress_search" indexed="true" stored="true" />
     <field name="priority" type="string" indexed="true" stored="true" omitNorms="true"/>
     <field name="hasFlag" type="int" indexed="true" stored="true" omitNorms="true"/>
     <field name="hasAttach" type="int" indexed="true" stored="true" omitNorms="true"/>
     <field name="l.size" type="zmnumber" indexed="true" stored="true" />
     <field name="filename" type="zmfilename" indexed="true" stored="true" />
-    <field name="filename_sw" type="zmfilename_sw" indexed="true" stored="true" />
     <field name="l.partname" type="string" indexed="true" stored="true" />
     <field name="type" type="zmmimetype" indexed="true" stored="true" />
     <field name="author" type="zmtext" indexed="true" stored="false"/>
@@ -190,10 +189,9 @@
 
     <copyField source="sourceFieldName" dest="destinationFieldName"/>
     -->
-    <copyField source="from" dest="from_sw"/>
-    <copyField source="to" dest="to_sw"/>
-    <copyField source="cc" dest="cc_sw"/>
-    <copyField source="filename" dest="filename_sw"/>
+    <copyField source="from" dest="from_search"/>
+    <copyField source="to" dest="to_search"/>
+    <copyField source="cc" dest="cc_search"/>
     <copyField source="sh_exact" dest="sh_terms"/>
 
     <!-- field type definitions. The "name" attribute is
@@ -346,25 +344,21 @@
     <fieldType name="zmaddress" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
       <analyzer type="index">
             <tokenizer class="com.zimbra.solr.ZimbraAddressTokenizerFactory"/>
-            <filter class="solr.ReversedWildcardFilterFactory" withOriginal="true"
-           maxPosAsterisk="3" maxPosQuestion="2" />
       </analyzer>
       <analyzer type="query">
             <tokenizer class="com.zimbra.solr.ZimbraAddressTokenizerFactory"/>
       </analyzer>
     </fieldType>
-    <fieldType name="zmaddress_sw" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
+    <fieldType name="zmaddress_search" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
       <analyzer type="index">
             <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-halfwidth-kana-voiced.txt"/>
             <tokenizer class="com.zimbra.solr.ZimbraAddressTokenizerFactory"/>
-            <filter class="solr.StopFilterFactory"/>
             <filter class="solr.ReversedWildcardFilterFactory" withOriginal="true"
            maxPosAsterisk="3" maxPosQuestion="2" />
       </analyzer>
       <analyzer type="query">
             <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-halfwidth-kana-voiced.txt"/>
             <tokenizer class="com.zimbra.solr.ZimbraAddressTokenizerFactory"/>
-            <filter class="solr.StopFilterFactory"/>
       </analyzer>
     </fieldType>
     <fieldType name="zmtext" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
@@ -385,7 +379,7 @@
         <filter class="com.zimbra.solr.ZimbraClassicTokenFilterFactory"/>
       </analyzer>
     </fieldType>
-    <fieldType name="zmtext_nr" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
+    <fieldType name="zmtext_noreverse" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
       <analyzer type="index">
         <charFilter class="solr.MappingCharFilterFactory" mapping="mapping-halfwidth-kana-voiced.txt"/>
         <charFilter class="com.zimbra.solr.ZimbraCharFilterFactory"/>
@@ -417,13 +411,6 @@
       <analyzer>
             <tokenizer class="solr.PatternTokenizerFactory" pattern="[,\s\r\n\.]"/>
             <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-    </fieldType>
-    <fieldType name="zmfilename_sw" class="solr.TextField" positionIncrementGap="100">
-      <analyzer>
-            <tokenizer class="solr.PatternTokenizerFactory" pattern="[,\s\r\n\.]"/>
-            <filter class="solr.LowerCaseFilterFactory"/>
-            <filter class="solr.StopFilterFactory"/>
       </analyzer>
     </fieldType>
     <fieldType name="zmmimetype" class="solr.TextField" positionIncrementGap="100">
