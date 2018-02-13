@@ -133,7 +133,7 @@
     <field name="subjSort" type="string" indexed="true" stored="false"/>
     <field name="subject" type="zmtext" indexed="true" stored="false" omitNorms="true" termVectors="true"/>
     <field name="nameSort" type="string" indexed="true" stored="false"/>
-    <field name="l.field" type="zmheaders" indexed="true" stored="true" multiValued="true"/>
+    <field name="l.field" type="zmheaders" indexed="true" stored="false" multiValued="true"/>
     <field name="msg_id" type="zmid" indexed="true" stored="false"/>
     <field name="env_to" type="zmaddress" indexed="true" stored="true" />
     <field name="env_from" type="zmaddress" indexed="true" stored="true"/>
