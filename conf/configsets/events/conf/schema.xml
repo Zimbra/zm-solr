@@ -19,7 +19,7 @@
 <schema name="events" version="1.6">
 
     <field name="_version_" type="long" indexed="false" stored="false"/>
-    <field name="id" type="string" indexed="true" stored="true" />
+    <field name="id" type="string" indexed="true" stored="true" required="true"/>
     <field name="_root_" type="string" indexed="true" stored="false"/>
     <field name="ev_type" type="string" indexed="true" stored="false" required="false"/>
     <field name="ev_timestamp" type="date" indexed="true" stored="true" required="false"/>

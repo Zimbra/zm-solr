@@ -122,7 +122,7 @@
     <field name="_version_" type="long" indexed="false" stored="false"/>
     <field name="_root_" type="string" indexed="true" stored="false" docValues="false" />
 
-    <field name="solrId" type="string" indexed="true" stored="true" required="true" />
+    <field name="id" type="string" indexed="true" stored="true" required="true" />
     <field name="l.mbox_blob_id" type="int" indexed="true" stored="true"  multiValued="false" />
     <field name="l.version" type="string" indexed="true" stored="true" />
     <field name="has" type="zmtext_noreverse" indexed="true" stored="false"/>
@@ -181,7 +181,7 @@
 
     <!-- Field to use to determine and enforce document uniqueness.
       Unless this field is marked with required="false", it will be a required field   -->   
-    <uniqueKey>solrId</uniqueKey>
+    <uniqueKey>id</uniqueKey>
  
     <!-- copyField commands copy one field to another at the time a document
        is added to the index.  It's used either to index the same field differently,
