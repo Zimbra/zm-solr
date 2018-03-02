@@ -51,6 +51,7 @@ public class WildcardQueryParser extends QueryParser {
 
 	@Override
 	public Query parse(String queryText) throws ParseException {
+	    queryText = queryText.replace("\\", "");
 		boolean hasWildcard = queryText.contains("*");
 		if (queryText.startsWith("+") || queryText.startsWith("-")) {
 			queryText = queryText.substring(1, queryText.length());
