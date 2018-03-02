@@ -13,8 +13,6 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
@@ -23,7 +21,6 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.Query;
@@ -299,11 +296,10 @@ public class WildcardQueryParser extends QueryParser {
 	/* modeled on TermsComponent.process() */
 	private List<Term> expandPrefix(String prefix, String field) throws IOException {
 		List<Term> expanded = new LinkedList<Term>();
-		Fields lfields = reader.fields();
-		if (lfields == null) {
+		Terms terms = reader.terms(field);
+		if (terms == null) {
 		    return expanded;
 		}
-		Terms terms = lfields.terms(field);
 		BytesRef prefixBytes = new BytesRef(prefix);
 		try {
 			TermsEnum termsEnum = terms.iterator();
