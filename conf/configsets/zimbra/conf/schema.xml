@@ -160,6 +160,8 @@
     <field name="doctype" type="string" indexed="true" stored="false" multiValued="false" />
     <field name="acct_id" type="string" indexed="true" stored="false" required="true" />
 
+    <dynamicField name="header_*" type="pints" indexed="true" stored="false"/>
+
     <!-- Only enabled in the "schemaless" data-driven example (assuming the client
          does not know what fields may be searched) because it's very expensive to index everything twice. -->
     <!-- <copyField source="*" dest="_text_"/> -->
