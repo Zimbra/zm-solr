@@ -16,37 +16,29 @@ package com.zimbra.solr;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.util.BytesRefBuilder;
-import org.apache.lucene.util.LegacyNumericUtils;
-import org.apache.lucene.util.NumericUtils;
 
 import com.google.common.base.Strings;
 
 /**
  * {@link TokenStream} for structured-data field.
  * <p>
- * {@code name:Val1 val2 val3} gets tokenized to {@code name:val1}, {@code name:val2}, {@code name:val3}. If the field
- * only consists of a single integer value, it produces an extra token of which name is appended by '#' to distinguish
- * from text search and the integer value gets encoded by Lucene's {@link NumericUtils}, so that it is also searchable
- * by numeric range query. Note that numeric fields are still tokenized as text too for wildcard search.
+ * {@code name:Val1 val2 val3} gets tokenized to {@code name:val1}, {@code name:val2}, {@code name:val3}.
  *
  * @see LuceneFields#L_FIELD
  * @author tim
  * @author ysasaki
+ * @author iraykin
  */
 public final class FieldTokenizer extends Tokenizer {
     private static final int MAX_TOKEN_LEN = 100;
     private static final int MAX_TOKEN_COUNT = 1000;
-    private static final Pattern NUMERIC_VALUE_REGEX = Pattern.compile("-?\\d+");
 
     private final List<String> tokens = new LinkedList<String>();
     private Iterator<String> iterator;
@@ -60,18 +52,7 @@ public final class FieldTokenizer extends Tokenizer {
         if (Strings.isNullOrEmpty(name) || Strings.isNullOrEmpty(value)) {
             return;
         }
-
         name = normalizeName(name);
-
-        if (NUMERIC_VALUE_REGEX.matcher(value).matches()) {
-            try {
-            	BytesRefBuilder brb = new BytesRefBuilder();
-            	LegacyNumericUtils.intToPrefixCoded(Integer.parseInt(value), 0, brb);
-                add(name + "#:" + brb.get().utf8ToString());
-            } catch (NumberFormatException ignore) { // pass through
-            }
-        }
-
         if (value.equals("*")) { // wildcard alone
             add(name + ":*");
             return;
