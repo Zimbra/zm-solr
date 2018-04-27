@@ -2,12 +2,12 @@
  * ***** BEGIN LICENSE BLOCK *****
  * Zimbra Collaboration Suite Server
  * Copyright (C) 2011, 2013 Zimbra Software, LLC.
- * 
+ *
  * The contents of this file are subject to the Zimbra Public License
  * Version 1.4 ("License"); you may not use this file except in
  * compliance with the License.  You may obtain a copy of the License at
  * http://www.zimbra.com/license.
- * 
+ *
  * Software distributed under the License is distributed on an "AS IS"
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.
  * ***** END LICENSE BLOCK *****
@@ -16,7 +16,6 @@ package com.zimbra.solr;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +36,7 @@ public final class MimeTypeTokenizer extends Tokenizer {
     private final List<String> tokens = new LinkedList<String>();
     private Iterator<String> itr;
     private final CharTermAttribute termAttr = addAttribute(CharTermAttribute.class);
-    
+
     public MimeTypeTokenizer() {
     	super();
     }
@@ -65,7 +64,7 @@ public final class MimeTypeTokenizer extends Tokenizer {
     @Override
     public boolean incrementToken() throws IOException {
     	clearAttributes();
-    	if (itr.hasNext()) {	
+        if (itr.hasNext()) {
             termAttr.setEmpty().append(itr.next());
             return true;
         } else {
@@ -87,7 +86,6 @@ public final class MimeTypeTokenizer extends Tokenizer {
 			return;
 		}
 	    add(s.toString());
-	    tokens.add(tokens.isEmpty() ? "none" : "any");
 	    itr = tokens.iterator();
     }
 
